@@ -3,21 +3,10 @@ package org.example.cornparser.validation;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.example.cornparser.validation.Constant.DAY_NAME_TO_NUMBER;
+import static org.example.cornparser.validation.Constant.MONTH_NAME_TO_NUMBER;
+
 public class CronValidator {
-
-    private static final Map<String, Integer> DAY_NAME_TO_NUMBER = new HashMap<>();
-
-    static {
-        // Mapping day names to numeric values (MON-SUN → 1-7, following Unix cron standard)
-        //DAY_NAME_TO_NUMBER.put("SUN", 0); // Optional: Some crons use 0 for Sunday
-        DAY_NAME_TO_NUMBER.put("MON", 1);
-        DAY_NAME_TO_NUMBER.put("TUE", 2);
-        DAY_NAME_TO_NUMBER.put("WED", 3);
-        DAY_NAME_TO_NUMBER.put("THU", 4);
-        DAY_NAME_TO_NUMBER.put("FRI", 5);
-        DAY_NAME_TO_NUMBER.put("SAT", 6);
-        DAY_NAME_TO_NUMBER.put("SUN", 7); // Both 0 and 7 can represent Sunday
-    }
 
     /**
      * Validates a cron field to ensure it follows the expected format.
@@ -57,12 +46,37 @@ public class CronValidator {
                 }
             } else if (part.contains("-")) {
                 // Handle range values (e.g., "10-20")
-                validateRangeOrNumber(part, min, max, fieldName);
+                if(fieldName.equals("day of week"))
+                    validateRangeOrDayNames(part, fieldName);
+                else if (fieldName.equals("month") ) {
+                    validateRangeOrMonthNames(part, fieldName);
+                } else
+                    // Handle single numeric values (e.g., "5")
+                    validateRangeOrNumber(part, min, max, fieldName);
             } else {
-                // Handle single numeric values (e.g., "5")
-                validateNumber(part, min, max, fieldName);
+                if(fieldName.equals("day of week"))
+                    validateSingleValueOrDayName(part, fieldName);
+                else if (fieldName.equals("month") ) {
+                    validateSingleValueOrMonthName(part, fieldName);
+                } else
+                    // Handle single numeric values (e.g., "5")
+                    validateNumber(part, min, max, fieldName);
             }
         }
+    }
+
+    private static void validateSingleValueOrDayName(String value, String fieldName) {
+        if (DAY_NAME_TO_NUMBER.containsKey(value)) {
+            return; // Valid named day (e.g., MON, TUE)
+        }
+        validateNumber(value, 0, 7, fieldName); // Allow numeric days (0-7)
+    }
+
+    private static void validateSingleValueOrMonthName(String value, String fieldName) {
+        if (MONTH_NAME_TO_NUMBER.containsKey(value)) {
+            return; // Valid named day (e.g., MON, TUE)
+        }
+        validateNumber(value, 0, 7, fieldName); // Allow numeric days (0-7)
     }
 
 
@@ -117,6 +131,51 @@ public class CronValidator {
             }
         } else { // If it's not a range, validate it as a single number
             validateNumber(range, min, max, fieldName);
+        }
+    }
+
+
+    private static void validateRangeOrDayNames(String range, String fieldName) {
+        String[] bounds = range.split("-");
+        if (bounds.length != 2) {
+            throw new IllegalArgumentException("Invalid range format in " + fieldName + ": " + range);
+        }
+
+        // Convert day names to numbers if needed
+        Integer start = DAY_NAME_TO_NUMBER.getOrDefault(bounds[0], -1);
+        Integer end = DAY_NAME_TO_NUMBER.getOrDefault(bounds[1], -1);
+
+        if (start == -1) start = Integer.parseInt(bounds[0]);
+        if (end == -1) end = Integer.parseInt(bounds[1]);
+
+        if (start < 0 || start > 7 || end < 0 || end > 7) {
+            throw new IllegalArgumentException(fieldName + " out of range: " + range);
+        }
+
+        if (start > end) {
+            throw new IllegalArgumentException(fieldName + " range start must be ≤ end: " + range);
+        }
+    }
+
+    private static void validateRangeOrMonthNames(String range, String fieldName) {
+        String[] bounds = range.split("-");
+        if (bounds.length != 2) {
+            throw new IllegalArgumentException("Invalid range format in " + fieldName + ": " + range);
+        }
+
+        // Convert day names to numbers if needed
+        int start = MONTH_NAME_TO_NUMBER.getOrDefault(bounds[0], -1);
+        int end = MONTH_NAME_TO_NUMBER.getOrDefault(bounds[1], -1);
+
+        if (start == -1) start = Integer.parseInt(bounds[0]);
+        if (end == -1) end = Integer.parseInt(bounds[1]);
+
+        if (start < 0 || start > 12 || end < 0 || end > 12) {
+            throw new IllegalArgumentException(fieldName + " out of range: " + range);
+        }
+
+        if (start > end) {
+            throw new IllegalArgumentException(fieldName + " range start must be ≤ end: " + range);
         }
     }
 }

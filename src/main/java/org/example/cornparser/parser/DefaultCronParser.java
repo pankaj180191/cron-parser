@@ -45,8 +45,8 @@ public class DefaultCronParser implements CronParser {
         List<Integer> minutes = minuteParser.parse(parts[0]);
         List<Integer> hours = hourParser.parse(parts[1]);
         List<Integer> daysOfMonth = dayOfMonthParser.parse(parts[2]);
-        List<Integer> months = monthParser.parse(parts[3]);
-        List<Integer> daysOfWeek = dayOfWeekParser.parse(parts[4]);
+        List<Object> months = monthParser.parseObj(parts[3]);
+        List<Object> daysOfWeek = dayOfWeekParser.parseObj(parts[4]);
 
         // Extract the command to be executed.
         String command = parts[5];
