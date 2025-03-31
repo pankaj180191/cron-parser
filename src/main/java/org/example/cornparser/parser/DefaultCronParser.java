@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import static org.example.cornparser.validation.CronValidator.validateCronField;
-import static org.example.cornparser.validation.CronValidator.validateCronFieldV2;
 
 public class DefaultCronParser implements CronParser {
     private static final int EXPECTED_FIELDS = 6; // A valid cron expression must have exactly 6 fields.
@@ -29,11 +28,11 @@ public class DefaultCronParser implements CronParser {
         }
 
         // Validate each cron field based on its allowed range.
-        validateCronFieldV2(parts[0], 0, 59, "minute");
-        validateCronFieldV2(parts[1], 0, 23, "hour");
-        validateCronFieldV2(parts[2], 1, 31, "day of month");
-        validateCronFieldV2(parts[3], 1, 12, "month");
-        validateCronFieldV2(parts[4], 0, 7, "day of week");
+        validateCronField(parts[0], 0, 59, "minute");
+        validateCronField(parts[1], 0, 23, "hour");
+        validateCronField(parts[2], 1, 31, "day of month");
+        validateCronField(parts[3], 1, 12, "month");
+        validateCronField(parts[4], 0, 7, "day of week");
 
         // Create field parsers for each cron field.
         CronFieldParser minuteParser = new CronFieldParser(0, 59);
