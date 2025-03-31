@@ -3,11 +3,14 @@ package org.example.cornparser.parser;
 import org.example.cornparser.model.CronExpression;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import static org.example.cornparser.validation.CronValidator.validateCronField;
 
 public class DefaultCronParser implements CronParser {
     private static final int EXPECTED_FIELDS = 6; // A valid cron expression must have exactly 6 fields.
+    private static final int MIN_FIELDS = 6; // Traditional cron has 6 fields
+    private static final int MAX_FIELDS = 7; // With optional year field
 
 
     /**
@@ -23,7 +26,7 @@ public class DefaultCronParser implements CronParser {
         String[] parts = cronExpression.trim().split("\\s+");
 
         // Validate that the cron expression has the expected number of fields.
-        if (parts.length != EXPECTED_FIELDS) {
+        if (parts.length < MIN_FIELDS || parts.length > MAX_FIELDS) {
             throw new IllegalArgumentException("Invalid cron expression: Expected 6 fields, found " + parts.length);
         }
 
@@ -33,6 +36,12 @@ public class DefaultCronParser implements CronParser {
         validateCronField(parts[2], 1, 31, "day of month");
         validateCronField(parts[3], 1, 12, "month");
         validateCronField(parts[4], 0, 7, "day of week");
+
+        Optional<List<Integer>> years = Optional.empty();
+        if (parts.length == 7) {
+            validateCronField(parts[5], 1970, 2099, "year");
+            years = Optional.of(new CronFieldParser(1970, 2099).parse(parts[5]));
+        }
 
         // Create field parsers for each cron field.
         CronFieldParser minuteParser = new CronFieldParser(0, 59);
@@ -49,9 +58,9 @@ public class DefaultCronParser implements CronParser {
         List<Integer> daysOfWeek = dayOfWeekParser.parse(parts[4]);
 
         // Extract the command to be executed.
-        String command = parts[5];
+        String command = parts[parts.length - 1];
 
         // Return a CronExpression object containing the parsed values.
-        return new CronExpression(minutes, hours, daysOfMonth, months, daysOfWeek, command);
+        return new CronExpression(minutes, hours, daysOfMonth, months, daysOfWeek, years, command);
     }
 }
