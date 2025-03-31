@@ -13,7 +13,7 @@ public class Main {
         ConcurrentCronParser concurrentParser = new ConcurrentCronParser();
 
         Future<CronExpression> future1 = concurrentParser.parseCronExpression("* 1-10 * * * /usr/bin/find");
-        Future<CronExpression> future2 = concurrentParser.parseCronExpression("12 * * 1 * /usr/bin/backup");
+        Future<CronExpression> future2 = concurrentParser.parseCronExpression("12 * * 1 * 2021-2023 /usr/bin/backup");
 
         // Retrieve results
         CronExpression result1 = future1.get();
