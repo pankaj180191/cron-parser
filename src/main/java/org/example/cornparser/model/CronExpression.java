@@ -12,8 +12,8 @@ public class CronExpression {
     private final List<Integer> minutes;
     private final List<Integer> hours;
     private final List<Integer> daysOfMonth;
-    private final List<Integer> months;
-    private final List<Integer> daysOfWeek;
+    private final List<Object> months;
+    private final List<Object> daysOfWeek;
     private final String command;
 
     /**
@@ -28,7 +28,7 @@ public class CronExpression {
      * @throws IllegalArgumentException if any list is null or empty, or if command is invalid.
      */
     public CronExpression(List<Integer> minutes, List<Integer> hours, List<Integer> daysOfMonth,
-                          List<Integer> months, List<Integer> daysOfWeek, String command) {
+                          List<Object> months, List<Object> daysOfWeek, String command) {
         this.minutes = minutes;
         this.hours = hours;
         this.daysOfMonth = daysOfMonth;
@@ -44,8 +44,8 @@ public class CronExpression {
         System.out.printf("%-14s%s%n", "minute", formatList(minutes));
         System.out.printf("%-14s%s%n", "hour", formatList(hours));
         System.out.printf("%-14s%s%n", "day of month", formatList(daysOfMonth));
-        System.out.printf("%-14s%s%n", "month", formatList(months));
-        System.out.printf("%-14s%s%n", "day of week", formatList(daysOfWeek));
+        System.out.printf("%-14s%s%n", "month", formatListObj(months));
+        System.out.printf("%-14s%s%n", "day of week", formatListObj(daysOfWeek));
         System.out.printf("%-14s%s%n", "command", command);
         System.out.println("****************************");
     }
@@ -57,6 +57,13 @@ public class CronExpression {
      * @return Formatted string representation of the list.
      */
     private String formatList(List<Integer> list) {
+        if (list == null || list.isEmpty()) {
+            return "N/A";  // Return "N/A" for empty or null lists
+        }
+        return list.toString().replaceAll("[\\[\\],]", "");
+    }
+
+    private String formatListObj(List<Object> list) {
         if (list == null || list.isEmpty()) {
             return "N/A";  // Return "N/A" for empty or null lists
         }
