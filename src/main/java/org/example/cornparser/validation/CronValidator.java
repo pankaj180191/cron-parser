@@ -112,9 +112,9 @@ public class CronValidator {
             // Ensure that the range is valid (start ≤ end)
             int start = Integer.parseInt(bounds[0]);
             int end = Integer.parseInt(bounds[1]);
-//            if (start > end) {
-//                throw new IllegalArgumentException(fieldName + " range start must be ≤ end: " + range);
-//            }
+            if (start > end) {
+                throw new IllegalArgumentException(fieldName + " range start must be ≤ end: " + range);
+            }
         } else { // If it's not a range, validate it as a single number
             validateNumber(range, min, max, fieldName);
         }
