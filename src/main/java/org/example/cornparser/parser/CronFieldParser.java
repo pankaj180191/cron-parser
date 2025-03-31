@@ -53,21 +53,7 @@ public class CronFieldParser {
                     values.add(i);
                 }
             } else if (field.contains("-")) {  // Range case (e.g., "1-5")
-                String[] parts = field.split("-");
-                if (parts.length != 2) {
-                    throw new IllegalArgumentException("Invalid range format: " + field);
-                }
-
-                int start = Integer.parseInt(parts[0]);
-                int end = Integer.parseInt(parts[1]);
-
-                if (start > end || start < minValue || end > maxValue) {
-                    throw new IllegalArgumentException("Invalid range: " + start + "-" + end);
-                }
-
-                for (int i = start; i <= end; i++) {
-                    values.add(i);
-                }
+                values.addAll(generateValues(field));
             } else if (field.contains(",")) {  // List case (e.g., "1,3,5")
                 String[] parts = field.split(",");
                 for (String part : parts) {
@@ -91,5 +77,38 @@ public class CronFieldParser {
         }
 
         return values;
+    }
+
+    /**
+     * Generates values for range fields, including wrap-around scenarios.
+     *
+     * @param field The range field string (e.g., "5-2" or "1-10").
+     * @return List of integers representing the expanded range values.
+     */
+    private List<Integer> generateValues(String field) {
+        List<Integer> result = new ArrayList<>();
+        String[] parts = field.split("-");
+
+        if (parts.length != 2) {
+            throw new IllegalArgumentException("Invalid range format: " + field);
+        }
+
+        int start = Integer.parseInt(parts[0]);
+        int end = Integer.parseInt(parts[1]);
+
+        if (start <= end) {
+            for (int i = start; i <= end; i++) {
+                result.add(i);
+            }
+        } else {  // Wrap-around case
+            for (int i = start; i <= maxValue; i++) {
+                result.add(i);
+            }
+            for (int i = minValue; i <= end; i++) {
+                result.add(i);
+            }
+        }
+
+        return result;
     }
 }
