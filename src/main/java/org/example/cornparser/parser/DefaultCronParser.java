@@ -1,6 +1,9 @@
 package org.example.cornparser.parser;
 
 import org.example.cornparser.model.CronExpression;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -23,7 +26,7 @@ public class DefaultCronParser implements CronParser {
         String[] parts = cronExpression.trim().split("\\s+");
 
         // Validate that the cron expression has the expected number of fields.
-        if (parts.length != EXPECTED_FIELDS) {
+        if (parts.length < EXPECTED_FIELDS) {
             throw new IllegalArgumentException("Invalid cron expression: Expected 6 fields, found " + parts.length);
         }
 
@@ -49,9 +52,28 @@ public class DefaultCronParser implements CronParser {
         List<Integer> daysOfWeek = dayOfWeekParser.parse(parts[4]);
 
         // Extract the command to be executed.
-        String command = parts[5];
+        String[] commandParts = Arrays.copyOfRange(parts, 5, parts.length);
+        String command = processCommand(commandParts);
 
         // Return a CronExpression object containing the parsed values.
         return new CronExpression(minutes, hours, daysOfMonth, months, daysOfWeek, command);
     }
+
+    public static String processCommand(String[] command) {
+        if (command == null || command.length == 0) {
+            throw new IllegalArgumentException("Command cannot be null or empty");
+        }
+
+        String mainCommand = command[0];
+        List<String> subCommands = new ArrayList<>();
+
+        for (int i = 1; i < command.length; i += 1) {
+            //String key = command[i].replace("-", "");
+            //String value = command[i + 1];
+            subCommands.add(command[i]);
+        }
+
+        return mainCommand + " " + String.join(" ", subCommands);
+    }
+
 }

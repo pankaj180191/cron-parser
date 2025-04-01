@@ -52,7 +52,7 @@ public class CronFieldParser {
                 for (int i = start; i <= maxValue; i += step) {
                     values.add(i);
                 }
-            } else if (field.contains("-")) {  // Range case (e.g., "1-5")
+            } else if (field.contains("-")) { // Range case (e.g., "1-5")
                 String[] parts = field.split("-");
                 if (parts.length != 2) {
                     throw new IllegalArgumentException("Invalid range format: " + field);
@@ -92,4 +92,5 @@ public class CronFieldParser {
 
         return values;
     }
+
 }
