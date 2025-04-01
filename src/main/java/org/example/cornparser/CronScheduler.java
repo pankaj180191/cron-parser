@@ -6,6 +6,50 @@ import java.util.*;
 
 public class CronScheduler {
 
+    /*
+    Corner Cases
+    1️⃣ What if day of week conflicts with day of month?
+    Example:
+
+    "day of month": [15]
+
+    "day of week": [0] (Sunday)
+
+    If 15th of a month is not a Sunday, the job won't run that month.
+
+    2️⃣ What if day of month = * and day of week = *?
+    The job will run every minute of every day.
+
+    3️⃣ Leap Year Handling (Feb 29)
+    Example: "day of month": [29], "month": [2]
+
+    The job will only execute in leap years (e.g., 2024, 2028).
+
+    4️⃣ Invalid Dates
+    Example: "day of month": [31], "month": [4]
+
+    April has only 30 days, so this should be skipped.
+
+    5️⃣ Current Time Greater Than Next Possible Time
+    Example:
+
+    "minute": [0], "hour": [9]
+
+    Current time = March 28, 2025, 10:30 AM
+
+    Next valid execution → April 1st at 9:00 AM, not today.
+
+    6️⃣ Time Rolls Over to Next Year
+    Example:
+
+    "month": [12], "day of month": [31]
+
+    Current time = Dec 30, 2025, 11:00 PM
+
+    Next valid execution → Dec 31, 2025, 11:00 PM
+
+    If hour = 23, minute = 59, next execution may be next year.
+     */
     public static List<String> findNextNOccurrences(Map<String, List<Integer>> parsedCron, int n) {
         LocalDateTime currentTime = LocalDateTime.now();
         int currentYear = currentTime.getYear();

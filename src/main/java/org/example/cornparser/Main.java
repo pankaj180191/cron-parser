@@ -15,6 +15,15 @@ import static org.example.cornparser.CronScheduler.findNextNOccurrences;
 public class Main {
     public static void main(String[] args) throws ExecutionException, InterruptedException {
 
+        /*
+        Minutes: [0, 15, 30, 45]
+        Hours: [0]
+        Days of Month: [1, 15]
+        Months: [*]
+        Days of Week: [1, 2, 3, 4, 5]
+        Command: /usr/bin/find
+         */
+
         //Handle Concurrent Request
 //        ConcurrentCronParser concurrentParser = new ConcurrentCronParser();
 //
